@@ -1,9 +1,8 @@
 import general_motion_retargeting.utils.lafan_vendor.utils as utils
 from general_motion_retargeting.utils.xsens_vendor.BVHParser import BVHParser, Anim
+import json
 import numpy as np
-from general_motion_retargeting.utils.xsens_vendor.bvh_edit.CurveEditor import (
-    OffsetManager,
-)
+import os
 
 
 def bvh_parse(args):
@@ -13,9 +12,19 @@ def bvh_parse(args):
     rotations, positions = parser.parse(
         bvh_text, start=args.start, end=args.end, reset_to_zero=args.reset_to_zero
     )
-    offset_manager = OffsetManager(default_path="offsets.json")
-    loaded_offsets = offset_manager.load_offsets()
-    offsets = offset_manager.parse_to_window_format(parser.names, loaded_offsets)
+    loaded_offsets = {}
+    if os.path.exists("offsets.json"):
+        with open("offsets.json", "r") as f:
+            loaded_offsets = json.load(f)
+    else:
+        print("offsets.json not found; using zero joint offsets.")
+
+    channels = ("X", "Y", "Z")
+    offsets = {
+        (joint_index, channel_index): loaded_offsets.get(joint_name, {}).get(channel, 0.0)
+        for joint_index, joint_name in enumerate(parser.names)
+        for channel_index, channel in enumerate(channels)
+    }
     new_rotations = np.zeros_like(rotations)
     joint_offset = np.zeros((new_rotations.shape[1], 3))
     for i in range(new_rotations.shape[1]):

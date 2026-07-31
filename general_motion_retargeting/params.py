@@ -21,6 +21,7 @@ ROBOT_XML_DICT = {
     "booster_k1": ASSET_ROOT / "booster_k1" / "K1_serial.xml",
     "pnd_adam_lite": ASSET_ROOT / "pnd_adam_lite" / "scene.xml",
     "tienkung": ASSET_ROOT / "tienkung" / "mjcf" / "tienkung.xml",
+    "tiangong3": ASSET_ROOT / "tiangong3" / "urdf" / "tiangong3.xml",
     "pal_talos": ASSET_ROOT / "pal_talos" / "talos.xml",
     "fourier_gr3": ASSET_ROOT / "fourier_gr3v2_1_1" / "mjcf" / "gr3v2_1_1_dummy_hand.xml",
 }
@@ -61,6 +62,7 @@ IK_CONFIG_DICT = {
     "bvh_xsens":{
         "unitree_g1": IK_CONFIG_ROOT / "bvh_xsens_to_g1.json",
         "unitree_h1_2": IK_CONFIG_ROOT / "bvh_xsens_to_h1_2.json",
+        "tiangong3": IK_CONFIG_ROOT / "bvh_xsens_to_tiangong3.json",
     },
     "fbx":{
         "unitree_g1": IK_CONFIG_ROOT / "fbx_to_g1.json",
@@ -96,6 +98,7 @@ ROBOT_BASE_DICT = {
     "booster_k1": "Trunk",
     "pnd_adam_lite": "pelvis",
     "tienkung": "Base_link",
+    "tiangong3": "pelvis",
     "pal_talos": "base_link",
     "fourier_gr3": "base_link",
 }
@@ -117,6 +120,7 @@ VIEWER_CAM_DISTANCE_DICT = {
     "booster_k1": 2.0,
     "pnd_adam_lite": 3.0,
     "tienkung": 3.0,
+    "tiangong3": 3.0,
     "pal_talos": 3.0,
     "fourier_gr3": 2.0,
 }

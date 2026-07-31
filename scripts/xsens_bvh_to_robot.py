@@ -27,6 +27,7 @@ if __name__ == "__main__":
         choices=[
             "unitree_g1",
             "unitree_h1_2",
+            "tiangong3",
             "Q1",
             "X1",
         ],
@@ -37,6 +38,12 @@ if __name__ == "__main__":
         "--record_video",
         action="store_true",
         default=False,
+    )
+
+    parser.add_argument(
+        "--no_visualization",
+        action="store_true",
+        help="Retarget and save without opening the MuJoCo viewer.",
     )
 
     parser.add_argument(
@@ -123,15 +130,17 @@ if __name__ == "__main__":
 
     motion_fps = int(1/frame_time)
 
-    robot_motion_viewer = RobotMotionViewer(
-        robot_type=args.robot,
-        motion_fps=motion_fps,
-        transparent_robot=0,
-        record_video=args.record_video,
-        video_path=args.video_path,
-        # video_width=2080,
-        # video_height=1170
-    )
+    robot_motion_viewer = None
+    if not args.no_visualization:
+        robot_motion_viewer = RobotMotionViewer(
+            robot_type=args.robot,
+            motion_fps=motion_fps,
+            transparent_robot=0,
+            record_video=args.record_video,
+            video_path=args.video_path,
+            # video_width=2080,
+            # video_height=1170
+        )
 
     # FPS measurement variables
     fps_counter = 0
@@ -162,20 +171,20 @@ if __name__ == "__main__":
 
         # Update task targets.
         smplx_data = lafan1_data_frames[i]
-        smplx_data = lafan1_data_frames[i]
 
         # retarget
         qpos = retargeter.retarget(smplx_data)
 
         # visualize
-        robot_motion_viewer.step(
-            root_pos=qpos[:3],
-            root_rot=qpos[3:7],
-            dof_pos=qpos[7:],
-            human_motion_data=retargeter.scaled_human_data,
-            rate_limit=args.rate_limit,
-            # human_pos_offset=np.array([0.0, 0.0, 0.0])
-        )
+        if robot_motion_viewer is not None:
+            robot_motion_viewer.step(
+                root_pos=qpos[:3],
+                root_rot=qpos[3:7],
+                dof_pos=qpos[7:],
+                human_motion_data=retargeter.scaled_human_data,
+                rate_limit=args.rate_limit,
+                # human_pos_offset=np.array([0.0, 0.0, 0.0])
+            )
 
         i += 1
 
@@ -186,7 +195,8 @@ if __name__ == "__main__":
         import pickle
 
         root_pos = np.array([qpos[:3] for qpos in qpos_list])
-        root_rot = np.array([qpos[3:7] for qpos in qpos_list])
+        # Store quaternions as xyzw, matching load_robot_motion().
+        root_rot = np.array([qpos[3:7][[1, 2, 3, 0]] for qpos in qpos_list])
         dof_pos = np.array([qpos[7:] for qpos in qpos_list])
         local_body_pos = None
         body_names = None
@@ -206,4 +216,5 @@ if __name__ == "__main__":
     # Close progress bar
     pbar.close()
 
-    robot_motion_viewer.close()
+    if robot_motion_viewer is not None:
+        robot_motion_viewer.close()

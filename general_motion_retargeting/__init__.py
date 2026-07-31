@@ -3,7 +3,11 @@ from .params import IK_CONFIG_ROOT, ASSET_ROOT, ROBOT_XML_DICT, IK_CONFIG_DICT, 
 from .motion_retarget import GeneralMotionRetargeting
 from .robot_motion_viewer import RobotMotionViewer, draw_frame
 from .data_loader import load_robot_motion
-from .kinematics_model import KinematicsModel
+
+try:
+    from .kinematics_model import KinematicsModel
+except ImportError:
+    KinematicsModel = None
 
 from .neck_retarget import human_head_to_robot_neck
 
